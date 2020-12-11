@@ -163,6 +163,24 @@ class Network(object):
         W = np.ones((dim,dim))*self.network_params['w']
         W[1:dim:2] *= -self.network_params['g']
         W = np.transpose(W)
+
+        # Type specific weight adaptation
+        try:
+            E_to_I = self.network_params['E-to-I']
+        except KeyError:
+            E_to_I = 1
+
+        try:
+            I_to_E = self.network_params['I-to-I']
+        except KeyError:
+            I_to_E = 1
+
+        # Adapt excitatory to inhibitory connections
+        W[1:dim:2,0:dim:2] *= E_to_I
+
+        # Adapt inhibitory to excitatory connections
+        W[0:dim:2,1:dim:2] *= I_to_E
+
         derived_params['W'] = W
 
         # weight matrix in mV (voltage)
